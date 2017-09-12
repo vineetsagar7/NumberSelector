@@ -1,0 +1,89 @@
+.isToggleButton {
+    color:black;
+    margin : 10px;
+    min-height: 70%;
+}
+
+button:focus {outline:0;}
+
+.toggle-btn{
+    
+    user-select: none; /* CSS3 (little to no support) */
+    -ms-user-select: none; /* IE 10+ */
+    -moz-user-select: none; /* Gecko (Firefox) */
+    -webkit-user-select: none; /* Webkit (Safari, Chrome) */
+
+    color: black;
+    border: 1px solid #eee;
+    background-color: #eee;
+    width: 38px;
+    margin: 7px;
+    font-size: 1em;
+    display: inline-block;
+    word-wrap: break-word;
+    border-left-width: 1px;
+    position: relative;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 2px;
+    padding-left:3px;
+    cursor: pointer;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: 0.2s;
+    box-shadow: 0 1px 0px 0 rgba(0, 0, 0, 0.26);
+}
+
+.toggle-btn:hover{
+    background-color: #e8e3e3;
+    border: 1px solid #e8e3e3;
+}
+
+.selected {
+    background: #0b5394;
+    color: black;
+    border: 1px solid #0b5394;
+    color: white;
+
+}
+.selected:hover{
+    background-color:#0d64b3;
+    border: 1px solid #0d64b3;
+}
+
+.marginTop{
+    font-size: 1.2em;
+    margin-top: 15px;
+}
+
+.btn2{
+    font-size: 1em;
+    display: inline-block;
+    word-wrap: break-word;
+    border-left-width: 1px;
+    height: 36px;
+    border-radius: 2px;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-right:16px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    transition-delay: 0.2s;
+}
+
+.md-1{
+width:110px;
+}
+
+.btn2-success {
+    margin-top:20px;
+    margin-left:10px;
+    border: 1px solid #4cae4c;
+    background-color: #4cae4c;
+
+}
+
+.btn2-fail {
+    margin-left:25px;
+    margin-top:20px;
+    border: 1px solid #d43f3a;
+    background-color: #d43f3a;
+}

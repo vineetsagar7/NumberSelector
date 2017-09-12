@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" href="button.css">
+  <title>Toggle Button App</title>
+  <script type="text/javascript">
+
+      function ToggleButton(enabled, value, parent) {
+
+          this.enabled = enabled;
+          this.years = value;
+          this.parent = parent;
+
+          this.toggleEnabled = function () {
+
+              this.enabled = !this.enabled;
+              this.setEnabled(this.enabled);
+          };
+
+          this.setEnabled = function(enabled) {
+
+              this.enabled = enabled;
+              var elem = document.getElementById('tb_' + this.years);
+
+              var className = elem.className.replace('selected', '').trim();
+              if (enabled) {
+                  className += ' selected';
+              }
+              elem.className = className;
+
+              if(this.parent)
+                  this.parent.updateField();
+          }
+
+          this.render = function(parent) {
+
+              this.elem = document.createElement('div')
+              this.elem.id = 'tb_' + this.years;
+              this.elem.className = this.enabled ? 'toggle-btn selected' : 'toggle-btn';
+              this.elem.innerHTML = this.years;
+
+              parent.elem.appendChild(this.elem);
+
+              var years = this.years;
+              this.elem.addEventListener('click', function(e) { toggleGrp.toggleElement(e, years); });
+          };
+      }
+
+      function ToggleButtonGroup(start, end, selection) {
+
+          this.start = start;
+          this.end = end;
+          this.selection = selection.split(",");
+          this.elems = [];
+          this.lastSel = null;
+
+          this.toggleElement = function(e, years) {
+
+            this.elems[years].toggleEnabled();
+
+            if (e.shiftKey && this.lastSel != null && years !== this.lastSel)
+                this.shiftSelection(years);
+
+            this.lastSel = years;
+          };
+
+          this.shiftSelection = function(years) {
+
+              if (this.lastSel == null)  return;
+
+                var start = years;
+                if (years > this.lastSel) {
+                    start = this.lastSel
+                    this.lastSel = years;
+                }
+                for (let i = start; i <= this.lastSel; i++) {
+                    this.elems[i].setEnabled(true);
+                }
+          };
+
+          this.applyToAll = function(enabled) {
+
+              for (var i = this.start; i <= end; i++) {
+                  this.elems[i].setEnabled(enabled);
+              }
+
+              this.lastSel = null;
+          };
+
+          this.clearSelection = function() {
+
+              this.applyToAll(false);
+          };
+
+          this.selectAll = function() {
+
+              this.applyToAll(true);
+          };
+
+          this.onMouseDown = function(e) {
+              this.startSelectX = e.clientX;
+              this.startSelectY = e.clientY;
+              this.mouseDownValue = true;
+              return true;
+          };
+
+          this.onMouseUp = function(e) {
+              this.mouseDownValue = false;
+              return true;
+          };
+
+          this.onMouseMove = function(e) {
+
+              if (this.mouseDownValue === true) {
+
+                  var startX = this.startSelectX < e.clientX ? this.startSelectX : e.clientX;
+                  var startY = this.startSelectY < e.clientY ? this.startSelectY : e.clientY;
+                  var endX = this.startSelectX < e.clientX ? e.clientX : this.startSelectX;
+                  var endY = this.startSelectY < e.clientY ? e.clientY : this.startSelectY;
+
+                  for (var x = startX; x <= endX; x += 10) {
+                      for (var y = startY; y <= endY; y += 10) {
+                          var elemID = document.elementFromPoint(x, y).id;
+                          if (elemID && elemID !== "toggleGrp") {
+                              this.elems[elemID.split("_")[1]].setEnabled(true);
+                          }
+                      }
+                  }
+              }
+          };
+
+          this.updateField = function() {
+
+              this.selection = [];
+              for(var key in this.elems) {
+                  if(this.elems[key].enabled)
+                      this.selection.push(this.elems[key].years);
+              }
+              this.field.setAttribute('value', this.selection.join(','));
+          };
+
+          this.render = function(parentElem) {
+
+              this.elem = document.createElement('div')
+              this.elem.id = 'toggleGrp';
+
+              parentElem.appendChild(this.elem);
+
+              this.field = document.createElement('input');
+              this.field.id = 'Season_Years_Selection';
+              this.field.setAttribute('name', 'Season_Years_Selection');
+              this.field.setAttribute('type', 'hidden');
+              this.field.setAttribute('value', this.selection.join(','));
+
+              this.elem.appendChild(this.field);
+
+              for(var i = this.start; i <= this.end; i++) {
+
+                  var enabled = false;
+                  for(var j = 0; j < this.selection.length; j++) {
+                      if(this.selection[j] == i) {
+                          enabled = true;
+                          break;
+                      }
+                  }
+
+                  var btn = new ToggleButton(enabled, i, this);
+                  btn.render(this);
+                  this.elems[i] = btn;
+              }
+
+              this.elem.addEventListener("mousedown", function(e) { toggleGrp.onMouseDown(e);});
+              this.elem.addEventListener("mouseup", function(e) { toggleGrp.onMouseUp(e);});
+              this.elem.addEventListener("mousemove", function(e) { toggleGrp.onMouseMove(e);});
+
+              var container = document.createElement("p");
+              this.elem.appendChild(container);
+
+              this.addAnchorElem(container, false);
+
+              var separator = document.createTextNode("  |  ");
+              container.appendChild(separator);
+
+              this.addAnchorElem(container, true);
+          };
+
+          this.addAnchorElem = function(container, isClearAll) {
+
+              var anchor = document.createElement("a");
+              anchor.setAttribute("href", "javascript: void(0);");
+              anchor.innerHTML = !isClearAll ? 'Select All' : 'Clear All';
+              container.appendChild(anchor);
+              if(!isClearAll)
+                  anchor.addEventListener('click', function(e) { toggleGrp.selectAll(); });
+              else
+                  anchor.addEventListener('click', function(e) { toggleGrp.clearSelection(); });
+          };
+      }
+  </script>
+</head>
+
+<body>
+
+  <form name="myForm" id="myForm">
+    <div id="root"></div>
+  </form>
+
+<script type="text/javascript">
+    var rootElem = document.getElementById('root');
+    var toggleGrp = new ToggleButtonGroup(1924,2016, "1926,2014,2015");
+    toggleGrp.render(rootElem);
+</script>
+</body>
+
+</html>
